@@ -63,9 +63,21 @@ app.post("/api/persons", (request, response) => {
   const data = request.body;
   const name = data.name;
   const number = data.number;
-  console.log(data);
-  persons.push({ id, name, number });
-  response.json(persons);
+  if (name !== "" && number !== "") {
+    const validname = persons.find((person) => person.name === name);
+
+    if (validname) {
+      response.send({ error: "name already exist" });
+      return;
+    }
+    persons.push({ id, name, number });
+    response.json({ id, name, number });
+    return;
+  }
+  name === ""
+    ? response.send({ error: "missing name" })
+    : response.send({ error: "missing number" });
+  return;
 });
 
 const PORT = 3001;
