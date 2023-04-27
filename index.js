@@ -58,6 +58,16 @@ app.delete("/api/delete/:id", (request, response) => {
   response.json(persons);
 });
 
+app.post("/api/persons", (request, response) => {
+  const id = Math.floor(Math.random() * 1000);
+  const data = request.body;
+  const name = data.name;
+  const number = data.number;
+  console.log(data);
+  persons.push({ id, name, number });
+  response.json(persons);
+});
+
 const PORT = 3001;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
