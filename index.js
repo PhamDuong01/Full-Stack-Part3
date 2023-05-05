@@ -51,7 +51,7 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/delete/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   const person = persons.filter((person) => person.id !== id);
   persons = person;
@@ -67,16 +67,15 @@ app.post("/api/persons", (request, response) => {
     const validname = persons.find((person) => person.name === name);
 
     if (validname) {
-      response.send({ error: "name already exist" });
-      return;
+      return response.status(400).json({ error: "name must be unique" });
     }
     persons.push({ id, name, number });
     response.json({ id, name, number });
     return;
   }
   name === ""
-    ? response.send({ error: "missing name" })
-    : response.send({ error: "missing number" });
+    ? response.status(400).json({ error: "missing name" })
+    : response.status(400).json({ error: "missing number" });
   return;
 });
 
