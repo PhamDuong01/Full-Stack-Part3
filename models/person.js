@@ -60,4 +60,15 @@ function addPerson(person) {
   });
 }
 
-module.exports = { Person, getAllPerson, getPerson, addPerson };
+function updatePerson(id, person) {
+  const personUpdate = person.number;
+  Person.findById(id).then((person) => {});
+}
+
+async function deletePerson(id) {
+  Person.findByIdAndRemove(id).then((result) => {
+    return;
+  });
+}
+
+module.exports = { Person, getAllPerson, getPerson, addPerson, updatePerson, deletePerson };

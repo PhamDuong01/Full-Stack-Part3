@@ -1,21 +1,21 @@
 const express = require("express");
 const app = express();
-app.use(express.json());
-app.use(express.static("build"));
+const morgan = require("morgan");
+const cors = require("cors");
+const personService = require("./models/person");
+
+const PORT = process.env.PORT || 3001;
 
 //setup morgan to log requests
-const morgan = require("morgan");
-
 morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
 app.use(morgan(`:method :url :status :res[content-length] - :response-time ms :body`));
 
 //setup cors
-const cors = require("cors");
+app.use(express.json());
+app.use(express.static("build"));
 app.use(cors());
-
-const personService = require("./models/person");
 
 //Router
 app.get("/", (request, response) => {
@@ -59,11 +59,7 @@ app.post("/api/persons", (request, response) => {
   return response.json(request.body);
 });
 
-app.put("api/persons/:id", (request, response) => {
-  personService.updatePerson(request.params.id, request.body);
-});
-
 //start server
-const PORT = 3001;
+
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
