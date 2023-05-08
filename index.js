@@ -48,6 +48,21 @@ app.get("/api/persons/:id", async (request, response) => {
   }
 });
 
+app.delete("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  personService.deletePerson(id);
+  return response.json({ message: "deleted " });
+});
+
+app.post("/api/persons", (request, response) => {
+  const data = personService.addPerson(request.body);
+  return response.json(request.body);
+});
+
+app.put("api/persons/:id", (request, response) => {
+  personService.updatePerson(request.params.id, request.body);
+});
+
 //start server
 const PORT = 3001;
 app.listen(PORT);

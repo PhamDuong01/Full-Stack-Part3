@@ -60,17 +60,4 @@ function addPerson(person) {
   });
 }
 
-function updatePerson(id, person) {
-  const personUpdate = person.number;
-  Person.findById(id).then((person) => {
-    console.log(person);
-  });
-}
-
-async function deletePerson(id) {
-  Person.findByIdAndRemove(id).then((result) => {
-    console.log("deleted ", id);
-  });
-}
-
-module.exports = { Person, getAllPerson, getPerson, addPerson, updatePerson, deletePerson };
+module.exports = { Person, getAllPerson, getPerson, addPerson };
