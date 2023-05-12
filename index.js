@@ -22,7 +22,7 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
 
-app.get("/api/persons", async (request, response) => {
+app.get("/api/persons", async (request, response, next) => {
   Person.find({})
     .then((result) => {
       if (result) {
@@ -32,8 +32,7 @@ app.get("/api/persons", async (request, response) => {
       }
     })
     .catch((error) => {
-      console.log(error);
-      response.status(400).send({ error: "malformatted id" });
+      next(error);
     });
 });
 
@@ -47,7 +46,7 @@ app.get("/info", async (request, response) => {
   `);
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id)
     .then((result) => {
       if (result) {
@@ -57,13 +56,24 @@ app.get("/api/persons/:id", (request, response) => {
       }
     })
     .catch((error) => {
-      console.log(error);
-      response.status(400).send({ error: "malformatted id" });
+      next(error);
     });
 });
 
-app.delete("/api/persons/:id", async (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
+    .then((result) => {
+      return response.status(204).end();
+      // response.status(400).json({ error: "a was already removed from server" });
+    })
+    .catch((error) => next(error));
+});
+
+app.post("/api/persons", (request, response) => {
+  person = new Person(request.body);
+
+  person
+    .save()
     .then((result) => {
       if (result) {
         response.json(result);
@@ -72,29 +82,17 @@ app.delete("/api/persons/:id", async (request, response) => {
       }
     })
     .catch((error) => {
-      console.log(error);
-      response.status(400).send({ error: "malformatted id" });
+      next(error);
     });
-});
-
-app.post("/api/persons", (request, response) => {
-  person = new Person(request.body);
-
-  person.save().then((result) => {
-    if (result) {
-      response.json(result);
-    } else {
-      response.status(404).end();
-    }
-  });
 });
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
+app.use(unknownEndpoint);
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message);
+  // console.error(error.message);
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
@@ -103,7 +101,6 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
-app.use(unknownEndpoint);
 app.use(errorHandler);
 //start server
 
