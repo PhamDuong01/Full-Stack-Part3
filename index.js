@@ -85,7 +85,19 @@ app.post("/api/persons", (request, response) => {
       next(error);
     });
 });
+app.put("/api/persons/:id", (request, response, next) => {
+  const person = {
+    name: request.body.name,
+    number: request.body.number,
+  };
 
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatePerson) => {
+      return response.json(updatePerson);
+      // response.status(400).json({ error: "a was already removed from server" });
+    })
+    .catch((error) => next(error));
+});
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
