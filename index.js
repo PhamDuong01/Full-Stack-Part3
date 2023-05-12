@@ -89,7 +89,7 @@ app.post("/api/persons", (request, response, next) => {
           message: { isShow: true, message: `added ${result.name}`, isSuccess: true },
         });
       } else {
-        response.status(404).end();
+        response.status(401).end();
       }
     })
     .catch((error) => {
@@ -102,7 +102,11 @@ app.put("/api/persons/:id", (request, response, next) => {
     number: request.body.number,
   };
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true })
+  Person.findByIdAndUpdate(request.params.id, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((updatePerson) => {
       return response.json({
         updatePerson: updatePerson,
