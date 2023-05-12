@@ -17,6 +17,12 @@ app.use(express.json());
 app.use(express.static("build"));
 app.use(cors());
 
+const message = {
+  isShow: false,
+  message: "",
+  isSuccess: false,
+};
+
 //Router
 app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
@@ -63,20 +69,25 @@ app.get("/api/persons/:id", (request, response, next) => {
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then((result) => {
-      return response.status(204).end();
+      return response.json({
+        message: { isShow: true, message: `Deleted ${result.name}`, isSuccess: true },
+      });
       // response.status(400).json({ error: "a was already removed from server" });
     })
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   person = new Person(request.body);
 
   person
     .save()
     .then((result) => {
       if (result) {
-        response.json(result);
+        response.status(200).json({
+          result: result,
+          message: { isShow: true, message: `added ${result.name}`, isSuccess: true },
+        });
       } else {
         response.status(404).end();
       }
@@ -91,9 +102,12 @@ app.put("/api/persons/:id", (request, response, next) => {
     number: request.body.number,
   };
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true })
     .then((updatePerson) => {
-      return response.json(updatePerson);
+      return response.json({
+        updatePerson: updatePerson,
+        message: { isShow: true, message: `edited ${updatePerson.name}`, isSuccess: true },
+      });
       // response.status(400).json({ error: "a was already removed from server" });
     })
     .catch((error) => next(error));
@@ -107,6 +121,13 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  }
+  if (error.name === "ValidationError") {
+    return response.status(400).json({
+      isShow: true,
+      message: error.message,
+      isSuccess: false,
+    });
   }
 
   next(error);
