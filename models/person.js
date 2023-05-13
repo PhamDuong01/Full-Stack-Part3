@@ -1,28 +1,28 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 dotenv.config();
 const url = process.env.MONGODB_URI;
 
-mongoose.set("strictQuery", false);
-console.log("connecting to PhoneBook MongoDB", url);
+mongoose.set('strictQuery', false);
+console.log('connecting to PhoneBook MongoDB', url);
 
 mongoose
   .connect(url)
   .then((result) => {
-    console.log("connected to PhoneBook MongoDB");
+    console.log('connected to PhoneBook MongoDB');
   })
   .catch((error) => {
-    console.log("error connecting to PhoneBook MongoDB:", error.message);
+    console.log('error connecting to PhoneBook MongoDB:', error.message);
   });
 
 const personSchema = new mongoose.Schema({
   name: {
-    type: "string",
+    type: 'string',
     minLength: 3,
     require: true,
   },
   number: {
-    type: "string",
+    type: 'string',
     minLength: 8,
     validate: {
       validator: function (v) {
@@ -34,7 +34,7 @@ const personSchema = new mongoose.Schema({
   },
 });
 
-personSchema.set("toJSON", {
+personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -42,4 +42,4 @@ personSchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("Person", personSchema);
+module.exports = mongoose.model('Person', personSchema);
